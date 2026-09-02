@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ledger_navy">#123C3A</color>
+    <color name="ledger_navy_light">#245B57</color>
+    <color name="ledger_mint">#D9F3E8</color>
+    <color name="ledger_income">#087F5B</color>
+    <color name="ledger_income_soft">#E1F4EC</color>
+    <color name="ledger_expense">#D9485F</color>
+    <color name="ledger_expense_soft">#FDE8EC</color>
+    <color name="ledger_amber">#F4B860</color>
+    <color name="ledger_background">#F4F7F6</color>
+    <color name="ledger_surface">#FFFFFFFF</color>
+    <color name="ledger_text">#18302F</color>
+    <color name="ledger_text_muted">#617674</color>
+    <color name="ledger_divider">#DCE6E4</color>
+    <color name="ledger_dark_background">#0F1818</color>
+    <color name="ledger_dark_surface">#172524</color>
+    <color name="ledger_dark_text">#E5EFED</color>
+    <color name="ledger_dark_muted">#A4B8B5</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>
