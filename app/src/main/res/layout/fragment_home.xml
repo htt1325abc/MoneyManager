@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/ledger_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
@@ -17,6 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/home_title"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
             android:textColor="?attr/colorOnSurface"
@@ -27,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/current_month"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="@color/ledger_text_muted" />
@@ -48,44 +51,46 @@
             android:textColor="@color/ledger_expense"
             android:visibility="gone" />
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            app:cardBackgroundColor="@color/ledger_navy"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="0dp">
+            android:background="@drawable/bg_balance_gradient"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.04"
+                android:text="@string/current_balance"
+                android:textAllCaps="true"
+                android:textColor="@color/ledger_mint"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/balanceAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/money_zero"
+                android:textAppearance="@style/TextAppearance.MoneyManager.HeroAmount" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/current_balance"
-                    android:textColor="@color/ledger_mint"
-                    android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/balance_updated_label"
+                android:textColor="@color/ledger_mint"
+                android:textSize="13sp" />
 
-                <TextView
-                    android:id="@+id/balanceAmount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/money_zero"
-                    android:textColor="@color/white"
-                    android:textSize="34sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="48dp"
-                    android:layout_height="4dp"
-                    android:layout_marginTop="18dp"
-                    android:background="@color/ledger_amber" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <View
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="18dp"
+                android:background="@color/ledger_amber" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -95,24 +100,24 @@
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.MoneyManager.Card"
+                style="@style/Widget.MoneyManager.Card.Income"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/ledger_income_soft">
+                android:layout_weight="1">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+
                         android:text="@string/income"
-                        android:textColor="@color/ledger_income" />
+                        android:textColor="@color/ledger_income"
+                        />
 
                     <TextView
                         android:id="@+id/incomeAmount"
@@ -127,12 +132,11 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.MoneyManager.Card"
+                style="@style/Widget.MoneyManager.Card.Expense"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/ledger_expense_soft">
+                android:layout_weight="1">
 
                 <LinearLayout
                     android:layout_width="match_parent"

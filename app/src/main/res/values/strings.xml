@@ -1,10 +1,16 @@
 <resources>
     <string name="app_name">Money Management</string>
-    <string name="home_title">Money Management</string>
+    <string name="home_title">Tổng quan tài chính của Tú</string>
     <string name="current_month">Sổ thu chi tháng này</string>
     <string name="current_balance">Số dư hiện tại</string>
     <string name="income">Thu nhập</string>
     <string name="expense">Chi tiêu</string>
+    <string name="financial_overview">Tình hình tài chính của bạn</string>
+    <string name="balance_updated_label">Số dư sau tất cả giao dịch</string>
+    <string name="income_this_month">Thu tháng này</string>
+    <string name="expense_this_month">Chi tháng này</string>
+    <string name="income_symbol">↗</string>
+    <string name="expense_symbol">↘</string>
     <string name="recent_transactions">Giao dịch gần đây</string>
     <string name="view_all">Xem tất cả</string>
     <string name="add_transaction">Thêm giao dịch</string>

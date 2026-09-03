@@ -1,16 +1,21 @@
 <resources>
-    <style name="Base.Theme.MoneyManager" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.MoneyManager"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
         <item name="colorPrimary">@color/ledger_mint</item>
         <item name="colorOnPrimary">@color/ledger_navy</item>
         <item name="colorSecondary">@color/ledger_amber</item>
         <item name="colorOnSecondary">@color/ledger_navy</item>
+
         <item name="android:colorBackground">@color/ledger_dark_background</item>
         <item name="colorSurface">@color/ledger_dark_surface</item>
         <item name="colorOnSurface">@color/ledger_dark_text</item>
+
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/ledger_dark_surface</item>
     </style>
 
-    <style name="Theme.MoneyManager" parent="Base.Theme.MoneyManager" />
+    <style name="Theme.MoneyManager"
+        parent="Base.Theme.MoneyManager" />
 </resources>
