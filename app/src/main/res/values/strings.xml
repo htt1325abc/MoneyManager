@@ -17,6 +17,16 @@
     <string name="edit_transaction">Sửa giao dịch</string>
     <string name="transactions_title">Giao dịch</string>
     <string name="statistics_title">Thống kê</string>
+    <string name="statistics_period_hint">Chọn khoảng thời gian cần xem</string>
+    <string name="period_week">Tuần</string>
+    <string name="period_month">Tháng</string>
+    <string name="period_year">Năm</string>
+    <string name="period_year_label">Năm %1$d</string>
+    <string name="period_previous_symbol">‹</string>
+    <string name="period_next_symbol">›</string>
+    <string name="content_description_previous_period">Xem kỳ trước</string>
+    <string name="content_description_next_period">Xem kỳ sau</string>
+    <string name="statistics_balance">Chênh lệch trong kỳ</string>
     <string name="search_hint">Tìm theo tiêu đề hoặc ghi chú</string>
     <string name="filter_all">Tất cả</string>
     <string name="filter_income">Thu nhập</string>
@@ -32,7 +42,7 @@
     <string name="empty_search">Không tìm thấy giao dịch phù hợp. Hãy đổi từ khóa hoặc bộ lọc.</string>
     <string name="category_statistics">Chi tiêu theo danh mục</string>
     <string name="monthly_statistics">Thống kê theo tháng</string>
-    <string name="no_expense_statistics">Chưa có khoản chi để thống kê.</string>
+    <string name="no_expense_statistics">Chưa có khoản chi trong thời gian này.</string>
     <string name="transaction_title_hint">Ví dụ: Ăn trưa</string>
     <string name="amount_hint">Số tiền (VND)</string>
     <string name="type_hint">Loại giao dịch</string>

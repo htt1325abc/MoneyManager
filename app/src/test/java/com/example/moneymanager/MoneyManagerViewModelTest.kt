@@ -2,11 +2,16 @@ package com.example.moneymanager
 
 import com.example.moneymanager.domain.repository.TransactionRepository
 import com.example.moneymanager.model.Category
+import com.example.moneymanager.model.StatisticsPeriod
 import com.example.moneymanager.model.Transaction
 import com.example.moneymanager.model.TransactionSort
 import com.example.moneymanager.model.TransactionType
 import com.example.moneymanager.presentation.main.LoadState
 import com.example.moneymanager.presentation.main.MoneyManagerViewModel
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,6 +77,60 @@ class MoneyManagerViewModelTest {
     }
 
     @Test
+    fun statisticsPeriod_filtersAndMovesToPreviousPeriod() = runTest {
+        val repository = FakeTransactionRepository()
+        val clock = Clock.fixed(
+            Instant.parse("2026-09-03T12:00:00Z"),
+            ZoneOffset.UTC,
+        )
+        val viewModel = MoneyManagerViewModel(repository, clock)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+        repository.emit(
+            listOf(
+                transaction(
+                    1,
+                    "Lương tháng 9",
+                    10_000_000,
+                    TransactionType.INCOME,
+                    Category.SALARY,
+                    dateMillis(2026, 9, 1),
+                ),
+                transaction(
+                    2,
+                    "Ăn trưa tháng 9",
+                    100_000,
+                    TransactionType.EXPENSE,
+                    Category.FOOD,
+                    dateMillis(2026, 9, 2),
+                ),
+                transaction(
+                    3,
+                    "Mua sắm tuần trước",
+                    900_000,
+                    TransactionType.EXPENSE,
+                    Category.SHOPPING,
+                    dateMillis(2026, 8, 30),
+                ),
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals(10_000_000L, viewModel.uiState.value.statisticsIncome)
+        assertEquals(100_000L, viewModel.uiState.value.statisticsExpense)
+
+        viewModel.updateStatisticsPeriod(StatisticsPeriod.WEEK)
+        viewModel.showPreviousStatisticsPeriod()
+        advanceUntilIdle()
+
+        val previousWeek = viewModel.uiState.value
+        assertEquals(0L, previousWeek.statisticsIncome)
+        assertEquals(900_000L, previousWeek.statisticsExpense)
+        assertEquals(Category.SHOPPING, previousWeek.categoryStatistics.single().category)
+    }
+
+    @Test
     fun writeActions_delegateToRepository() = runTest {
         val repository = FakeTransactionRepository()
         val viewModel = MoneyManagerViewModel(repository)
@@ -95,6 +154,12 @@ class MoneyManagerViewModelTest {
         category: Category,
         createdAt: Long,
     ) = Transaction(id, title, amount, type, category, createdAt = createdAt)
+
+    private fun dateMillis(year: Int, month: Int, day: Int): Long =
+        LocalDate.of(year, month, day)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
 
     private class FakeTransactionRepository : TransactionRepository {
         private val transactions = MutableStateFlow<List<Transaction>>(emptyList())

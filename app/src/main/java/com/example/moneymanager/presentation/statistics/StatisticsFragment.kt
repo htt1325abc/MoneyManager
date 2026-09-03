@@ -14,11 +14,15 @@ import com.example.moneymanager.MoneyManagerApplication
 import com.example.moneymanager.R
 import com.example.moneymanager.databinding.FragmentStatisticsBinding
 import com.example.moneymanager.databinding.ItemStatisticBinding
+import com.example.moneymanager.model.StatisticsPeriod
 import com.example.moneymanager.presentation.common.labelRes
 import com.example.moneymanager.presentation.common.toMoneyFormat
 import com.example.moneymanager.presentation.main.MoneyManagerUiState
 import com.example.moneymanager.presentation.main.MoneyManagerViewModel
 import com.example.moneymanager.presentation.main.MoneyManagerViewModelFactory
+import com.example.moneymanager.service.StatisticsPeriodCalculator
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlinx.coroutines.launch
 
 class StatisticsFragment : Fragment() {
@@ -40,6 +44,7 @@ class StatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurePeriodControls()
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect(::render)
@@ -48,9 +53,27 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun render(state: MoneyManagerUiState) = with(binding) {
-        balanceAmount.text = state.balance.toMoneyFormat()
-        incomeAmount.text = getString(R.string.labeled_amount, getString(R.string.income), state.income.toMoneyFormat())
-        expenseAmount.text = getString(R.string.labeled_amount, getString(R.string.expense), state.expense.toMoneyFormat())
+        val selectedButtonId = when (state.statisticsSelection.period) {
+            StatisticsPeriod.WEEK -> R.id.weekButton
+            StatisticsPeriod.MONTH -> R.id.monthButton
+            StatisticsPeriod.YEAR -> R.id.yearButton
+        }
+        if (periodGroup.checkedButtonId != selectedButtonId) {
+            periodGroup.check(selectedButtonId)
+        }
+        periodLabel.text = formatPeriodLabel(state)
+
+        balanceAmount.text = state.statisticsBalance.toMoneyFormat()
+        incomeAmount.text = getString(
+            R.string.labeled_amount,
+            getString(R.string.income),
+            state.statisticsIncome.toMoneyFormat(),
+        )
+        expenseAmount.text = getString(
+            R.string.labeled_amount,
+            getString(R.string.expense),
+            state.statisticsExpense.toMoneyFormat(),
+        )
 
         categoryEmpty.isVisible = state.categoryStatistics.isEmpty()
         categoryContainer.removeAllViews()
@@ -78,6 +101,51 @@ class StatisticsFragment : Fragment() {
             )
             row.progress.progress = if (total == 0L) 0 else (statistic.expense * 100 / total).toInt()
             monthlyContainer.addView(row.root)
+        }
+    }
+
+    private fun configurePeriodControls() = with(binding) {
+        periodGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            val period = when (checkedId) {
+                R.id.weekButton -> StatisticsPeriod.WEEK
+                R.id.yearButton -> StatisticsPeriod.YEAR
+                else -> StatisticsPeriod.MONTH
+            }
+            viewModel.updateStatisticsPeriod(period)
+        }
+        previousPeriodButton.setOnClickListener {
+            viewModel.showPreviousStatisticsPeriod()
+        }
+        nextPeriodButton.setOnClickListener {
+            viewModel.showNextStatisticsPeriod()
+        }
+    }
+
+    private fun formatPeriodLabel(state: MoneyManagerUiState): String {
+        val selection = state.statisticsSelection
+        val range = StatisticsPeriodCalculator.rangeContaining(
+            anchorDate = selection.anchorDate,
+            period = selection.period,
+        )
+        val locale = Locale.forLanguageTag("vi-VN")
+
+        return when (selection.period) {
+            StatisticsPeriod.WEEK -> {
+                val startFormatter = DateTimeFormatter.ofPattern("dd/MM", locale)
+                val endFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", locale)
+                val endInclusive = range.endExclusive.minusDays(1)
+                "${range.startInclusive.format(startFormatter)} – ${endInclusive.format(endFormatter)}"
+            }
+            StatisticsPeriod.MONTH -> range.startInclusive
+                .format(DateTimeFormatter.ofPattern("MMMM yyyy", locale))
+                .replaceFirstChar { character ->
+                    if (character.isLowerCase()) character.titlecase(locale) else character.toString()
+                }
+            StatisticsPeriod.YEAR -> getString(
+                R.string.period_year_label,
+                range.startInclusive.year,
+            )
         }
     }
 

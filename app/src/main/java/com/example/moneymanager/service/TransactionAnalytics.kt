@@ -4,6 +4,7 @@ import com.example.moneymanager.model.Category
 import com.example.moneymanager.model.Transaction
 import com.example.moneymanager.model.TransactionSort
 import com.example.moneymanager.model.TransactionType
+import java.time.ZoneId
 
 data class TransactionSummary(
     val income: Long,
@@ -53,4 +54,24 @@ object TransactionAnalytics {
             .filter { it.type == TransactionType.EXPENSE }
             .groupBy { it.category }
             .mapValues { (_, items) -> items.sumOf { it.amount } }
+
+    fun transactionsInRange(
+        transactions: List<Transaction>,
+        range: StatisticsDateRange,
+        zoneId: ZoneId,
+    ): List<Transaction> {
+        val startMillis = range.startInclusive
+            .atStartOfDay(zoneId)
+            .toInstant()
+            .toEpochMilli()
+        val endExclusiveMillis = range.endExclusive
+            .atStartOfDay(zoneId)
+            .toInstant()
+            .toEpochMilli()
+
+        return transactions.filter { transaction ->
+            transaction.createdAt >= startMillis &&
+                transaction.createdAt < endExclusiveMillis
+        }
+    }
 }

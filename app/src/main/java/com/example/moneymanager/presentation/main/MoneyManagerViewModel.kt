@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneymanager.domain.repository.TransactionRepository
 import com.example.moneymanager.model.Category
+import com.example.moneymanager.model.StatisticsPeriod
 import com.example.moneymanager.model.Transaction
 import com.example.moneymanager.model.TransactionSort
 import com.example.moneymanager.model.TransactionType
 import com.example.moneymanager.service.TransactionAnalytics
+import com.example.moneymanager.service.StatisticsPeriodCalculator
+import java.time.Clock
+import java.time.LocalDate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,10 +28,14 @@ import kotlinx.coroutines.launch
 
 class MoneyManagerViewModel(
     private val repository: TransactionRepository,
+    private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
     private val query = MutableStateFlow("")
     private val filter = MutableStateFlow(TransactionFilter())
     private val sort = MutableStateFlow(TransactionSort.NEWEST)
+    private val statisticsSelection = MutableStateFlow(
+        StatisticsSelection(anchorDate = LocalDate.now(clock))
+    )
 
     private val _events = MutableSharedFlow<UiEvent>(extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
@@ -37,8 +45,15 @@ class MoneyManagerViewModel(
         query,
         filter,
         sort,
-    ) { transactions, currentQuery, currentFilter, currentSort ->
-        createUiState(transactions, currentQuery, currentFilter, currentSort)
+        statisticsSelection,
+    ) { transactions, currentQuery, currentFilter, currentSort, currentStatisticsSelection ->
+        createUiState(
+            transactions,
+            currentQuery,
+            currentFilter,
+            currentSort,
+            currentStatisticsSelection,
+        )
     }.catch {
         emit(
             MoneyManagerUiState(
@@ -65,6 +80,20 @@ class MoneyManagerViewModel(
 
     fun updateSort(value: TransactionSort) {
         sort.value = value
+    }
+
+    fun updateStatisticsPeriod(period: StatisticsPeriod) {
+        val current = statisticsSelection.value
+        if (current.period == period) return
+        statisticsSelection.value = current.copy(period = period)
+    }
+
+    fun showPreviousStatisticsPeriod() {
+        moveStatisticsPeriod(-1)
+    }
+
+    fun showNextStatisticsPeriod() {
+        moveStatisticsPeriod(1)
     }
 
     fun addTransaction(transaction: Transaction) {
@@ -103,6 +132,7 @@ class MoneyManagerViewModel(
         currentQuery: String,
         currentFilter: TransactionFilter,
         currentSort: TransactionSort,
+        currentStatisticsSelection: StatisticsSelection,
     ): MoneyManagerUiState {
         val summary = TransactionAnalytics.summary(transactions)
         val visible = TransactionAnalytics.filterAndSort(
@@ -112,9 +142,23 @@ class MoneyManagerViewModel(
             category = currentFilter.category,
             sort = currentSort,
         )
-        val categoryStatistics = TransactionAnalytics.expenseByCategory(transactions)
+        val statisticsRange = StatisticsPeriodCalculator.rangeContaining(
+            anchorDate = currentStatisticsSelection.anchorDate,
+            period = currentStatisticsSelection.period,
+        )
+        val statisticsTransactions = TransactionAnalytics.transactionsInRange(
+            transactions = transactions,
+            range = statisticsRange,
+            zoneId = clock.zone,
+        )
+        val statisticsSummary = TransactionAnalytics.summary(statisticsTransactions)
+        val categoryStatistics = TransactionAnalytics.expenseByCategory(statisticsTransactions)
             .map { (category, amount) ->
-                val percent = if (summary.expense == 0L) 0 else (amount * 100 / summary.expense).toInt()
+                val percent = if (statisticsSummary.expense == 0L) {
+                    0
+                } else {
+                    (amount * 100 / statisticsSummary.expense).toInt()
+                }
                 CategoryStatistic(category, amount, percent)
             }
             .sortedByDescending { it.amount }
@@ -129,9 +173,24 @@ class MoneyManagerViewModel(
             recentTransactions = transactions.sortedByDescending { it.createdAt }.take(5),
             categoryStatistics = categoryStatistics,
             monthlyStatistics = monthlyStatistics(transactions),
+            statisticsSelection = currentStatisticsSelection,
+            statisticsIncome = statisticsSummary.income,
+            statisticsExpense = statisticsSummary.expense,
+            statisticsBalance = statisticsSummary.balance,
             query = currentQuery,
             filter = currentFilter,
             sort = currentSort,
+        )
+    }
+
+    private fun moveStatisticsPeriod(amount: Long) {
+        val current = statisticsSelection.value
+        statisticsSelection.value = current.copy(
+            anchorDate = StatisticsPeriodCalculator.move(
+                anchorDate = current.anchorDate,
+                period = current.period,
+                amount = amount,
+            )
         )
     }
 

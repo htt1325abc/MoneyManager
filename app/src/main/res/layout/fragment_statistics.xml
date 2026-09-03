@@ -25,14 +25,89 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/current_month"
+            android:text="@string/statistics_period_hint"
             android:textColor="@color/ledger_text_muted" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/periodGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:checkedButton="@id/monthButton"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/weekButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:text="@string/period_week" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/monthButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:text="@string/period_month" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/yearButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:text="@string/period_year" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/previousPeriodButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/content_description_previous_period"
+                android:minWidth="0dp"
+                android:text="@string/period_previous_symbol"
+                android:textSize="28sp" />
+
+            <TextView
+                android:id="@+id/periodLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/nextPeriodButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/content_description_next_period"
+                android:minWidth="0dp"
+                android:text="@string/period_next_symbol"
+                android:textSize="28sp" />
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.MoneyManager.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -43,7 +118,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/current_balance"
+                    android:text="@string/statistics_balance"
                     android:textColor="@color/ledger_text_muted" />
 
                 <TextView
